@@ -4,7 +4,7 @@ namespace Content.Server._WL.MetaData.Components;
 public sealed partial class RenameOnInteractComponent : Component
 {
     [DataField]
-    public bool NeedCharge { get; set; } = true;
+    public bool NeedCharges { get; set; } = true;
 
     [DataField]
     public bool UseVerbs { get; set; } = true;

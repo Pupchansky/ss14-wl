@@ -40,7 +40,7 @@ public sealed partial class RenameableSystem : EntitySystem
         if (!Resolve(entity, ref entity.Comp1, ref entity.Comp2, false))
             return false;
 
-        if (entity.Comp1.NeedCharge)
+        if (entity.Comp1.NeedCharges)
         {
             if (!TryComp<LimitedChargesComponent>(entity, out var chargesComp) || HasCharge((entity, chargesComp)) == false)
                 return false;
