@@ -165,7 +165,7 @@ public sealed partial class FaxMachineComponent : Component
     public float NoPaperNotifyCooldownTimeRemaining;
 
     [DataField]
-    public bool IsNotifyOnEmptyEnabled = true;
+    public bool IsNotifyOnEmptyEnable = true;
 
     [DataField]
     public bool IsMaterialStorageOpen = false;

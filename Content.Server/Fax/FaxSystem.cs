@@ -126,7 +126,7 @@ public sealed class FaxSystem : EntitySystem
         // WL-Changes-start
         if (!CanPrintFromMaterial((uid, comp)))
         {
-            if (comp.IsNotifyOnEmptyEnabled && comp.PrintingQueue.Count != 0)
+            if (comp.IsNotifyOnEmptyEnable && comp.PrintingQueue.Count != 0)
                 ProcessNoPaperNotify(uid, frameTime, comp);
 
             return;
@@ -142,7 +142,7 @@ public sealed class FaxSystem : EntitySystem
             var isAnimationEnd = comp.PrintingTimeRemaining <= 0;
             if (isAnimationEnd)
             {
-                ConsumeMaterial((uid, comp)); // WL-Changes
+                TryConsumeMaterial((uid, comp)); // WL-Changes
                 SpawnPaperFromQueue(uid, comp);
                 UpdateUserInterface(uid, comp);
             }
@@ -160,7 +160,7 @@ public sealed class FaxSystem : EntitySystem
     // WL-Changes-start
     private void OnNotifyButtonPressed(EntityUid uid, FaxMachineComponent component, FaxSwitchNotifyMessage args)
     {
-        component.IsNotifyOnEmptyEnabled = !component.IsNotifyOnEmptyEnabled;
+        component.IsNotifyOnEmptyEnable = !component.IsNotifyOnEmptyEnable;
         UpdateUserInterface(uid, component);
     }
 
@@ -181,9 +181,9 @@ public sealed class FaxSystem : EntitySystem
         return _materialStorage.CanChangeMaterialAmount(faxEnt, faxComp.PrintMaterial, -amount, materialStorageComp, localOnly);
     }
 
-    private void ConsumeMaterial(Entity<FaxMachineComponent, MaterialStorageComponent?> fax, bool dirty = true, bool localOnly = false)
+    private bool TryConsumeMaterial(Entity<FaxMachineComponent, MaterialStorageComponent?> fax, bool dirty = true, bool localOnly = false)
     {
-        _materialStorage.TryChangeMaterialAmount(fax, fax.Comp1.PrintMaterial, -fax.Comp1.PrintConsumeMaterialAmount, fax.Comp2, dirty, localOnly);
+        return _materialStorage.TryChangeMaterialAmount(fax, fax.Comp1.PrintMaterial, -fax.Comp1.PrintConsumeMaterialAmount, fax.Comp2, dirty, localOnly);
     }
 
     private void ProcessNoPaperNotify(EntityUid fax, float frameTime, FaxMachineComponent comp)
@@ -309,8 +309,8 @@ public sealed class FaxSystem : EntitySystem
 
         if (component.IsMaterialStorageOpen && _materialStorage.TryInsertMaterialEntity(args.User, args.Used, uid))
         {
-            component.InsertingTimeRemaining = component.InsertionTime;
             args.Handled = true;
+            UpdateUserInterface(uid, component);
             return;
         }
         // WL-Changes-end
@@ -493,7 +493,7 @@ public sealed class FaxSystem : EntitySystem
             component.DestinationFaxAddress,
             /*WL-Changes-start*/
             component.IsMaterialStorageOpen,
-            component.IsNotifyOnEmptyEnabled,
+            component.IsNotifyOnEmptyEnable,
             GetStoragePapersCount((uid, component))
             /*WL-Changes-end*/
             );
