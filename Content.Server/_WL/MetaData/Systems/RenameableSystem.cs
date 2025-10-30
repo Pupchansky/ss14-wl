@@ -45,7 +45,8 @@ public sealed partial class RenameableSystem : EntitySystem
             if (!TryComp<LimitedChargesComponent>(entity, out var chargesComp) || HasCharge((entity, chargesComp)) == false)
                 return false;
 
-            _charges.TryUseCharge((entity, chargesComp));
+            if (!_charges.TryUseCharge((entity, chargesComp)))
+                return false;
         }
 
         _metaData.SetEntityName(entity, name, entity.Comp2, raiseEvents);
@@ -104,7 +105,7 @@ public sealed partial class RenameableSystem : EntitySystem
         if (!comp.UseVerbs)
             return;
 
-        if (HasCharge(item) == false)
+        if (comp.NeedCharges && HasCharge(item) == false)
             return;
 
         var verb = new InteractionVerb()
