@@ -184,7 +184,9 @@ public sealed partial class EntityCopySystem : EntitySystem
             if (Equals(originValue, copyValue))
                 continue;
 
-            _serialization.CopyTo<object?>(originValue, ref copyValue);
+            var copiedValue = _serialization.CreateCopy(originValue);
+
+            field.SetValue(copy, copiedValue);
         }
 
         foreach (var prop in type.GetProperties(flags))
@@ -204,7 +206,9 @@ public sealed partial class EntityCopySystem : EntitySystem
             if (Equals(originValue, copyValue))
                 continue;
 
-            _serialization.CopyTo<object?>(originValue, ref copyValue);
+            var copiedValue = _serialization.CreateCopy(originValue);
+
+            prop.SetValue(copy, copiedValue);
         }
     }
 
