@@ -41,7 +41,8 @@ using System.Linq;
 using static Content.Shared.Configurable.ConfigurationComponent;
 using Content.Shared.Humanoid.Prototypes;
 using Content.Shared.Humanoid;
-using Content.Shared._WL.Skills.Components; // Wl-Skills
+using Content.Shared._WL.Skills.Components;
+using Content.Server._WL.GameObjects.Systems; // Wl-Skills
 
 
 namespace Content.Server.Administration.Systems
@@ -74,7 +75,10 @@ namespace Content.Server.Administration.Systems
         [Dependency] private readonly IPlayerManager _playerManager = default!;
         [Dependency] private readonly SiliconLawSystem _siliconLawSystem = default!;
 
+        // WL-Changes-start
         [Dependency] private readonly LanguagesSystem _languages = default!; //WL-Changes: Languages
+        [Dependency] private readonly EntityCopySystem _entityCopy = default!;
+        // WL-Changes-end
 
         private readonly Dictionary<ICommonSession, List<EditSolutionsEui>> _openSolutionUis = new();
 
@@ -678,6 +682,28 @@ namespace Content.Server.Administration.Systems
                 });
             }
             // Wl-Skills-end
+
+            // WL-Changes-start
+            if (_adminManager.HasAdminFlag(player, AdminFlags.Spawn))
+            {
+                args.Verbs.Add(new Verb
+                {
+                    Text = Loc.GetString("admin-player-actions-clone"),
+                    Category = VerbCategory.Debug,
+                    Act = () =>
+                    {
+                        if (!_entityCopy.CanCopyEntity(args.Target))
+                            return;
+
+                        _entityCopy.TryCopyEntity(args.Target, Transform(args.Target).Coordinates, out _);
+                    },
+                    IconEntity = GetNetEntity(args.Target),
+                    Impact = LogImpact.Medium,
+                    ConfirmationPopup = true,
+                    Priority = 0
+                });
+            }
+            // WL-Changes-end
         }
 
         #region SolutionsEui

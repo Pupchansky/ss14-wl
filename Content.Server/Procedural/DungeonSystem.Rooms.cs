@@ -1,4 +1,5 @@
 using System.Numerics;
+using Content.Server._WL.GameObjects.Systems;
 using Content.Shared.Decals;
 using Content.Shared.Maps;
 using Content.Shared.Procedural;
@@ -12,6 +13,10 @@ namespace Content.Server.Procedural;
 
 public sealed partial class DungeonSystem
 {
+    // WL-Changes-start
+    [Dependency] private readonly EntityCopySystem _entityCopy = default!;
+    // WL-Chanegs-end
+
     // Temporary caches.
     private readonly HashSet<EntityUid> _entitySet = new();
     private readonly List<DungeonRoomPrototype> _availableRooms = new();
@@ -182,20 +187,23 @@ public sealed partial class DungeonSystem
                 continue;
 
             var childRot = templateXform.LocalRotation + finalRoomRotation;
-            var protoId = _metaQuery.GetComponent(templateEnt).EntityPrototype?.ID;
+            // WL-Changes-start
+            //var protoId = _metaQuery.GetComponent(templateEnt).EntityPrototype?.ID;
 
-            // TODO: Copy the templated entity as is with serv
-            var ent = Spawn(protoId, new EntityCoordinates(gridUid, childPos));
+            _entityCopy.CopyEntity(templateEnt, new EntityCoordinates(gridUid, childPos), childRot);
 
-            var childXform = _xformQuery.GetComponent(ent);
-            var anchored = templateXform.Anchored;
-            _transform.SetLocalRotation(ent, childRot, childXform);
+            //var ent = Spawn(protoId, new EntityCoordinates(gridUid, childPos));
 
-            // If the templated entity was anchored then anchor us too.
-            if (anchored && !childXform.Anchored)
-                _transform.AnchorEntity((ent, childXform), (gridUid, grid));
-            else if (!anchored && childXform.Anchored)
-                _transform.Unanchor(ent, childXform);
+            //var childXform = _xformQuery.GetComponent(ent);
+            //var anchored = templateXform.Anchored;
+            //_transform.SetLocalRotation(ent, childRot, childXform);
+
+            //// If the templated entity was anchored then anchor us too.
+            //if (anchored && !childXform.Anchored)
+            //    _transform.AnchorEntity((ent, childXform), (gridUid, grid));
+            //else if (!anchored && childXform.Anchored)
+            //    _transform.Unanchor(ent, childXform);
+            // WL-Changes-end
         }
 
         // Load decals
