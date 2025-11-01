@@ -16,6 +16,7 @@
   id: Translate
   name: language-translate
   description: language-translate-desc
+  keylang: 'т'
   obfuscation:
     !type:WordsReplacementObfuscation
       replacement:
@@ -96,6 +97,7 @@
   name: language-unati
   description: language-unati-desc
   color: '#ede028'
+  keylang: 'у'
   obfuscation:
     !type:WordsReplacementObfuscation
       replacement:
@@ -131,6 +133,7 @@
   name: language-oldearth
   description: language-oldearth-desc
   color: "#5fff33"
+  keylang: 'з'
   obfuscation:
     !type:Utf16ReplacementObfuscation
       utf16start: 224
@@ -144,6 +147,7 @@
   name: language-vulpa
   description: language-vulpa-desc
   color: '#cccc00'
+  keylang: 'к'
   obfuscation:
     !type:Utf16ReplacementObfuscation
       utf16start: 224
@@ -157,6 +161,7 @@
   name: language-sareng
   description: language-sareng-desc
   color: '#ff644d'
+  keylang: 'р'
   obfuscation:
     !type:Utf16ReplacementObfuscation
       utf16start: 902
@@ -170,6 +175,7 @@
   name: language-weaver
   description: language-weaver-desc
   color: '#f5ee8c'
+  keylang: 'н'
   obfuscation:
     !type:EmoteObfuscation
       replacement:
@@ -187,6 +193,7 @@
   name: language-ternary
   description: language-ternary-desc
   color: '#03b5fc'
+  keylang: 'а'
   needtts: false
   needsound: true
   sound:
@@ -206,6 +213,7 @@
   name: language-rootspeak
   description: language-rootspeak-desc
   color: '#309100'
+  keylang: 'д'
   obfuscation:
     !type:EmoteObfuscation
       replacement:
@@ -222,6 +230,7 @@
   name: language-slimish
   description: language-slimish-desc
   color: '#309100'
+  keylang: 'с'
   needtts: false
   obfuscation:
     !type:EmoteObfuscation
@@ -238,6 +247,7 @@
   name: language-vox
   description: language-vox-desc
   color: '#8c6500'
+  keylang: 'в'
   obfuscation:
     !type:ByCharReplacementObfuscation
       replacement:
