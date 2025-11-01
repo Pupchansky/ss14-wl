@@ -122,13 +122,29 @@ public sealed class LanguagesSystem : SharedLanguagesSystem
 
     public string ObfuscateMessageFromSource(string message, EntityUid source)
     {
+        bool prefix = TryProcessLanguageMessage(source, message, out string new_message);
+
         if (!TryComp<LanguagesComponent>(source, out var source_lang))
-            return message;
+            return new_message;
         else
         {
-            var message_language = source_lang.CurrentLanguage;
-            var obfus = ObfuscateMessage(message, message_language);
-            return obfus;
+            if (!prefix)
+            {
+                var message_language = source_lang.CurrentLanguage;
+                var obfus = ObfuscateMessage(source, new_message, message_language);
+                return obfus;
+            }
+            else
+            {
+                var proto = GetLanguagePrototype(source, message);
+
+                if (proto == null)
+                    return new_message;
+
+                var message_language = proto.ID;
+                var obfus = ObfuscateMessage(source, new_message, message_language);
+                return obfus;
+            }
         }
     }
 
@@ -203,7 +219,9 @@ public sealed class LanguagesSystem : SharedLanguagesSystem
 
     public string GetRadioWrappedMessage(string message, EntityUid source, string name, SpeechVerbPrototype speech, RadioChannelPrototype channel, bool colorize = false)
     {
-        var color = GetColor(source);
+        bool prefix = TryProcessLanguageMessage(source, message, out string new_message);
+
+        var color = GetColor(message, source, prefix);
 
         if (color == Color.White)
             colorize = false;
@@ -216,7 +234,7 @@ public sealed class LanguagesSystem : SharedLanguagesSystem
             ("verb", Loc.GetString(_random.Pick(speech.SpeechVerbStrings))),
             ("channel", $"\\[{channel.LocalizedName}\\]"),
             ("name", name),
-            ("message", message),
+            ("message", new_message),
             ("langColor", color)
         ) :
             Loc.GetString(
@@ -227,16 +245,22 @@ public sealed class LanguagesSystem : SharedLanguagesSystem
             ("verb", Loc.GetString(_random.Pick(speech.SpeechVerbStrings))),
             ("channel", $"\\[{channel.LocalizedName}\\]"),
             ("name", name),
-            ("message", message)
+            ("message", new_message)
         );
 
         return wrappedMessage;
     }
 
-    public Color GetColor(EntityUid source)
+    public Color GetColor(string message, EntityUid source, bool prefix = false)
     {
         var color = Color.White;
-        if (TryComp<LanguagesComponent>(source, out var comp))
+
+        if (prefix)
+        {
+            var language = GetLanguagePrototype(source, message);
+            color = language != null ? language.Color : Color.White;
+        }
+        else if (TryComp<LanguagesComponent>(source, out var comp))
         {
             var language = GetLanguagePrototype(comp.CurrentLanguage);
             color = language != null ? language.Color : Color.White;
@@ -247,30 +271,40 @@ public sealed class LanguagesSystem : SharedLanguagesSystem
 
     public string GetWhisperWrappedMessage(string message, EntityUid source, string name, bool colorize = false)
     {
-        var color = GetColor(source);
 
+        bool prefix = TryProcessLanguageMessage(source, message, out string new_message);
+
+        var color = GetColor(message, source, prefix);
+        
         if (color == Color.White)
             colorize = false;
 
-        var escapedMessage = FormattedMessage.EscapeText(message);
+        var escapedMessage = FormattedMessage.EscapeText(new_message);
 
-        if (colorize)
+        if (new_message != string.Empty)
         {
+            if (colorize)
+            {
 
-            var wrappedMessage = Loc.GetString("chat-manager-entity-whisper-wrap-message-lang",
-                    ("entityName", name),
-                    ("message", escapedMessage),
-                    ("langColor", color));
+                var wrappedMessage = Loc.GetString("chat-manager-entity-whisper-wrap-message-lang",
+                        ("entityName", name),
+                        ("message", escapedMessage),
+                        ("langColor", color));
 
-            return wrappedMessage;
+                return wrappedMessage;
+            }
+            else
+            {
+                var wrappedMessage = Loc.GetString("chat-manager-entity-whisper-wrap-message",
+                        ("entityName", name),
+                        ("message", escapedMessage));
+
+                return wrappedMessage;
+            }
         }
         else
         {
-            var wrappedMessage = Loc.GetString("chat-manager-entity-whisper-wrap-message",
-                    ("entityName", name),
-                    ("message", escapedMessage));
-
-            return wrappedMessage;
+            return new_message;
         }
     }
 
@@ -289,26 +323,35 @@ public sealed class LanguagesSystem : SharedLanguagesSystem
 
     public string GetWrappedMessage(string message, EntityUid source, string name, SpeechVerbPrototype speech, bool colorize = false)
     {
-        var color = GetColor(source);
+        bool prefix = TryProcessLanguageMessage(source, message, out string new_message);
+
+        var color = GetColor(message, source, prefix);
 
         if (color == Color.White)
             colorize = false;
 
-        var wrappedMessage = colorize ? Loc.GetString(speech.Bold ? "chat-manager-entity-say-bold-wrap-message-lang" : "chat-manager-entity-say-wrap-message-lang",
-                ("entityName", name),
-                ("verb", Loc.GetString(_random.Pick(speech.SpeechVerbStrings))),
-                ("fontType", speech.FontId),
-                ("fontSize", speech.FontSize),
-                ("message", FormattedMessage.EscapeText(message)),
-                ("langColor", color)
-        ) :
-            Loc.GetString(speech.Bold ? "chat-manager-entity-say-bold-wrap-message" : "chat-manager-entity-say-wrap-message",
-                ("entityName", name),
-                ("verb", Loc.GetString(_random.Pick(speech.SpeechVerbStrings))),
-                ("fontType", speech.FontId),
-                ("fontSize", speech.FontSize),
-                ("message", FormattedMessage.EscapeText(message))
-        );
-        return wrappedMessage;
+        if (new_message != string.Empty)
+        {
+            var wrappedMessage = colorize ? Loc.GetString(speech.Bold ? "chat-manager-entity-say-bold-wrap-message-lang" : "chat-manager-entity-say-wrap-message-lang",
+                    ("entityName", name),
+                    ("verb", Loc.GetString(_random.Pick(speech.SpeechVerbStrings))),
+                    ("fontType", speech.FontId),
+                    ("fontSize", speech.FontSize),
+                    ("message", FormattedMessage.EscapeText(new_message)),
+                    ("langColor", color)
+            ) :
+                Loc.GetString(speech.Bold ? "chat-manager-entity-say-bold-wrap-message" : "chat-manager-entity-say-wrap-message",
+                    ("entityName", name),
+                    ("verb", Loc.GetString(_random.Pick(speech.SpeechVerbStrings))),
+                    ("fontType", speech.FontId),
+                    ("fontSize", speech.FontSize),
+                    ("message", FormattedMessage.EscapeText(new_message))
+            );
+            return wrappedMessage;
+        }
+        else
+        {
+            return new_message;
+        }
     }
  }

@@ -454,6 +454,8 @@ public sealed partial class ChatSystem : SharedChatSystem
 
         //WL-Changes: Languages start
         var wrappedMessage = _languages.GetWrappedMessage(message, source, name, speech, true);
+        if (wrappedMessage.Length == 0)
+            return;
         var obfusMessage = _languages.ObfuscateMessageFromSource(message, source);
 
         string obfusWrappedMessage;
@@ -528,10 +530,12 @@ public sealed partial class ChatSystem : SharedChatSystem
         name = FormattedMessage.EscapeText(name);
 
         //WL-Changes: Languages start
-        var color = _languages.GetColor(source);
+        //var color = _languages.GetColor(message, source); // Без полезно, но оставлю
         var wrappedMessage = _languages.GetWhisperWrappedMessage(message, source, nameIdentity, true);
+        if (wrappedMessage.Length == 0)
+            return;
 
-        var wrappedobfuscatedMessage= _languages.GetWhisperWrappedMessage(obfuscatedMessage, source, nameIdentity, false);
+        var wrappedobfuscatedMessage = _languages.GetWhisperWrappedMessage(obfuscatedMessage, source, nameIdentity, false);
 
         var wrappedUnknownMessage = Loc.GetString("chat-manager-entity-whisper-unknown-wrap-message",
             ("message", FormattedMessage.EscapeText(obfuscatedMessage)));
@@ -550,7 +554,7 @@ public sealed partial class ChatSystem : SharedChatSystem
             ("entityName", nameIdentity), ("message", FormattedMessage.EscapeText(biobfMessage)));
         var obfusUnknownMessage = Loc.GetString("chat-manager-entity-whisper-unknown-wrap-message",
             ("message", FormattedMessage.EscapeText(biobfMessage)));
-        //WL-Changes: Languages start
+        //WL-Changes: Languages end
 
 
         foreach (var (session, data) in GetRecipients(source, WhisperMuffledRange))
