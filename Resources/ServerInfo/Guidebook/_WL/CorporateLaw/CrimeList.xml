@@ -65,7 +65,7 @@
     </ColorBox>
     <ColorBox Color="#5b101a">
       <Box Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2">
-        [textlink="Мятеж или терракт" link="WLCLCrimeListT1S5"]
+        [textlink="Мятеж или теракт" link="WLCLCrimeListT1S5"]
       </Box>
     </ColorBox>
 
