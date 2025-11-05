@@ -46,7 +46,6 @@ public sealed class ContentSpriteSystem : EntitySystem
         //WL-Changes-start
         _sawmill = _logMan.GetSawmill("sprite.export");
         _control = new(_appearance);
-        _sawmill.Debug("ContentSpriteSystem initialized");
         //WL-Changes-end
 
         _resManager.UserData.CreateDir(Exports);
@@ -60,7 +59,6 @@ public sealed class ContentSpriteSystem : EntitySystem
 
         //WL-Changes-start
         _control.CancelAllQueued();
-        _sawmill.Debug("ContentSpriteSystem shutdown: cancelled pending exports.");
         //WL-Changes-end
 
         _ui.RootControl.RemoveChild(_control);
