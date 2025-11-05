@@ -166,12 +166,18 @@ public sealed class ContentSpriteSystem : EntitySystem
             return;
 
         var newEntity = Spawn(prototype);
-        _sprite.CopySprite(entity, newEntity);
-        _sprite.SetScale(newEntity, Vector2.One);
 
-        await Export(newEntity, dir, action, cancelToken);
+        try
+        {
+            _sprite.CopySprite(entity, newEntity);
+            _sprite.SetScale(newEntity, Vector2.One);
 
-        QueueDel(newEntity);
+            await Export(newEntity, dir, action, cancelToken);
+        }
+        finally
+        {
+            TryQueueDel(newEntity);
+        }
     }
 
     /// <summary>
@@ -244,7 +250,7 @@ public sealed class ContentSpriteSystem : EntitySystem
 
         if (includeId)
         {
-            fullFileName = Exports / $"{filename}-{queued.Direction}-{queued.Entity}.png";
+            fullFileName = Exports / $"{filename}-{queued.Direction}-{entity}.png";
         }
         else
         {
