@@ -3,9 +3,3 @@
   values:
     prefix: thankyou-corp-
     count: 3
-
-- type: localizedDataset
-  id: GothicOMatGoodbyes
-  values:
-    prefix: thankyou-gothic-
-    count: 4

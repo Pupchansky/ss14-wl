@@ -3,9 +3,3 @@
   values:
     prefix: advertisement-corp-
     count: 5
-
-- type: localizedDataset
-  id: GothicOMatAds
-  values:
-    prefix: advertisement-gothic-
-    count: 5
