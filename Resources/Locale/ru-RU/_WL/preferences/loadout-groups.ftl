@@ -11,4 +11,6 @@ loadout-group-adjutant-outerclothing = Адъютант, верхняя одеж
 
 loadout-group-neck-wl = Шея
 
+loadout-group-sec-badges-wl = Значки отличия, шея
+
 loadout-group-photo = Фотоаппарат
