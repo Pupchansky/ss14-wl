@@ -28,6 +28,11 @@
   <Import Project="..\RobustToolbox\MSBuild\Robust.Properties.targets" />
   <Import Project="..\RobustToolbox\MSBuild\XamlIL.targets" />
   <ItemGroup>
+    <Compile Update="_WL\UserInterface\Systems\Computers\StationaryComputerWindow.xaml.cs">
+      <DependentUpon>StationaryComputerWindow.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
     <AdditionalFiles Update="_WL\Photo\UI\PhotoCardWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </AdditionalFiles>
@@ -35,6 +40,9 @@
       <Generator>MSBuild:Compile</Generator>
     </AdditionalFiles>
     <AdditionalFiles Update="_WL\Photo\UI\TextureButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AdditionalFiles>
+    <AdditionalFiles Update="_WL\UserInterface\Systems\Computers\StationaryComputerWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </AdditionalFiles>
   </ItemGroup>

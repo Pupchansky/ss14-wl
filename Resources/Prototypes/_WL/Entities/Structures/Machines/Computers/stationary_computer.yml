@@ -1,0 +1,21 @@
+- type: entity
+  parent: BaseComputerAiAccess
+  id: StationaryComputer
+  components:
+  - type: StationaryComputer
+    baseContent:
+    - stationary-computer-welcome-string-1
+    - stationary-computer-welcome-string-2
+    - ""
+  - type: ActivatableUI
+    key: enum.StationaryComputerUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.StationaryComputerUiKey.Key:
+        type: StationaryComputerBUI
+      enum.WiresUiKey.Key:
+        type: WiresBoundUserInterface
+  - type: Computer
+    board: StationaryComputerCircuitboard
+  - type: ApcPowerReceiver
+    powerLoad: 400

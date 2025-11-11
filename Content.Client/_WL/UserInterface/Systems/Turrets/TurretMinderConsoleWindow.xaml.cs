@@ -8,7 +8,7 @@ using Robust.Client.UserInterface.CustomControls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Prototypes;
 
-namespace Content.Client._WL.Turrets;
+namespace Content.Client._WL.UserInterface.Systems.Turrets;
 
 [GenerateTypedNameReferences]
 public sealed partial class TurretMinderConsoleWindow : DefaultWindow

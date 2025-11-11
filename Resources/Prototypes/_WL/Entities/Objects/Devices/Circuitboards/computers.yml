@@ -7,3 +7,12 @@
       state: cpu_science
     - type: ComputerBoard
       prototype: ComputerTurretMinder
+
+- type: entity
+  parent: BaseComputerCircuitboard
+  id: StationaryComputerCircuitboard
+  components:
+    - type: Sprite
+      state: cpu_service
+    - type: ComputerBoard
+      prototype: StationaryComputer

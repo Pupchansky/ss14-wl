@@ -1,5 +1,5 @@
 - type: entity
-  parent: BaseComputer
+  parent: BaseComputerAiAccess
   id: ComputerTurretMinder
   name: ship's gun control console
   components:

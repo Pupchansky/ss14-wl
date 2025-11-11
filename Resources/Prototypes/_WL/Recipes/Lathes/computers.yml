@@ -6,3 +6,12 @@
     Steel: 500
     Plastic: 200
     Gold: 300
+
+- type: latheRecipe
+  id: StationaryComputerCircuitboardRecipe
+  result: StationaryComputerCircuitboard
+  completetime: 3
+  materials:
+    Plastic: 150
+    Steel: 300
+    Glass: 80

@@ -69,6 +69,7 @@
     - MassMediaCircuitboard
     - JukeboxCircuitBoard
     - PhotoCameraRecipe #WL-Changes-Photo
+    - StationaryComputerCircuitboardRecipe # WL-Changes
 
 - type: technology
   id: MeatManipulation

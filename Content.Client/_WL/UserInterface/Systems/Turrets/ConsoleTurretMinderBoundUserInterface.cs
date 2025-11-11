@@ -1,8 +1,7 @@
-using Content.Client.Ame.UI;
 using Content.Shared._WL.Turrets;
 using JetBrains.Annotations;
 
-namespace Content.Client._WL.Turrets
+namespace Content.Client._WL.UserInterface.Systems.Turrets
 {
     [UsedImplicitly]
     public sealed class ConsoleTurretMinderBoundUserInterface : BoundUserInterface
