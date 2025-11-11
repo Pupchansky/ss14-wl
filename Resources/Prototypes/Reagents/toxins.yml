@@ -568,7 +568,7 @@
       - !type:HealthChange
         conditions:
         - !type:MetabolizerTypeCondition
-          type: Cischi
+          type: [ Cischi ]
         damage:
           groups:
             Brute: -1
@@ -653,18 +653,11 @@
       effects:
       - !type:PopupMessage
         conditions:
-          - !type:MetabolizerTypeCondition
-            type: Animal
-            inverted: true
 # WL species start
-          # Golem
           - !type:MetabolizerTypeCondition
-            type: [ Golem ]
+            type: [ Animal, Vox, Golem ]
             inverted: true
 # WL species end
-          - !type:MetabolizerTypeCondition
-            type: [ Animal, Vox ]
-            inverted: true
         type: Local
         visualType: MediumCaution
         messages: [ "generic-reagent-effect-sick" ]
