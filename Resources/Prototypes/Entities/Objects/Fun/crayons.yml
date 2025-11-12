@@ -21,7 +21,7 @@
       enum.CrayonUiKey.Key:
         type: CrayonBoundUserInterface
   - type: Crayon
-    capacity: 250 #WL-Changes: Crayons up
+    capacity: 25 #WL-Changes: Crayons up
   - type: Edible
   - type: LimitedCharges
     maxCharges: 250
