@@ -24,7 +24,7 @@ public sealed partial class StationaryComputerComponent : Component
     [DataField, AutoNetworkedField]
     public bool Locked { get; set; } = false;
 
-    [DataField, AutoNetworkedField]
+    [DataField]
     public string? Password { get; set; }
 
     public void AddContent(string? content, string? root = null)

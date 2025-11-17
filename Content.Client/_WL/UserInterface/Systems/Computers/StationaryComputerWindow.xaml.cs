@@ -145,7 +145,7 @@ public sealed partial class StationaryComputerWindow : FancyWindow
         text = FormattedMessage.RemoveMarkupPermissive(text);
 
         if (text.Length > MaxLineLength)
-            text = text[..(MaxLineLength + 1)];
+            text = text[..MaxLineLength];
 
         return text;
     }
