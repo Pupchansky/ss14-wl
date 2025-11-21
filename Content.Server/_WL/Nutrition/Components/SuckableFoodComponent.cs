@@ -17,7 +17,6 @@ public sealed partial class SuckableFoodComponent : Component
     [DataField]
     public FixedPoint2 DissolveAmount { get; set; } = FixedPoint2.New(0.05f);
 
-    // TODO: написать отдельный тест и обработать в системе
     /// <summary>
     /// Не указывайте сущности в прототипе, у которых есть <see cref="SuckableFoodComponent"/>, иначе будет runtime-ошибочка.
     /// </summary>
