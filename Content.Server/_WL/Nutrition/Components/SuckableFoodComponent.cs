@@ -12,7 +12,7 @@ public sealed partial class SuckableFoodComponent : Component
     public string Solution { get; set; } = "food";
 
     /// <summary>
-    /// В секунду.
+    /// Количество поглощаемой из контейнера жидкости в секунду.
     /// </summary>
     [DataField]
     public FixedPoint2 DissolveAmount { get; set; } = FixedPoint2.New(0.05f);

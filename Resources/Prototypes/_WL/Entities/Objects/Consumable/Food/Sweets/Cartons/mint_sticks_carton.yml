@@ -1,5 +1,5 @@
 - type: entity
-  id: MintStickSweetsBox
+  id: FoodSweetsMintStickBox
   parent: [ BoxCardboard, BaseBagOpenClose ]
   components:
   - type: Sprite

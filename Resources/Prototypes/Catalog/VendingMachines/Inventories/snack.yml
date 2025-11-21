@@ -8,9 +8,9 @@
     FoodSnackSus: 3
     FoodSnackSemki: 3
     # WL-Changes-start
-    MintStickSweetsBox: 2
-    GumSweetsBox: 2
-    GummiesSweetsBox: 2
+    FoodSweetsMintStickBox: 2
+    FoodSweetsGumBox: 2
+    FoodSweetsGummiesBox: 2
     FoodSweetsChupachupsBlue: 2
     FoodSweetsChupachupsLime: 2
     FoodSweetsChupachupsOrange: 2

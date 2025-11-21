@@ -8,13 +8,13 @@ using Content.Shared.Chemistry;
 using Content.Shared.Chemistry.Components.SolutionManager;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.FixedPoint;
-using Content.Shared.IdentityManagement;
 using Content.Shared.Inventory;
 using Content.Shared.Inventory.Events;
 using Content.Shared.Mobs.Systems;
+using Content.Shared.Prototypes;
 using Robust.Server.Containers;
 using Robust.Shared.Player;
-using Robust.Shared.Utility;
+using Robust.Shared.Prototypes;
 
 namespace Content.Server._WL.Nutrition.Systems;
 
@@ -28,6 +28,8 @@ public sealed partial class SuckableFoodSystem : EntitySystem
     [Dependency] private readonly ForensicsSystem _forensics = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _protoMan = default!;
+    [Dependency] private readonly IComponentFactory _componentFactory = default!;
 
     private const float UpdatePeriod = 2f; // in seconds
     private float _updateTimer = 0f;
@@ -104,10 +106,6 @@ public sealed partial class SuckableFoodSystem : EntitySystem
         var (food, comp) = foodEnt;
 
         comp.SuckingEntity = sucker;
-
-        //_appearance.SetData(sucker, ..., sucker == null, appearanceComp);
-
-        //_clothing.SetEquippedPrefix();
     }
 
     private void OnEquip(EntityUid food, SuckableFoodComponent comp, GotEquippedEvent ev)
@@ -142,6 +140,13 @@ public sealed partial class SuckableFoodSystem : EntitySystem
 
         if (comp.EquippedEntityOnDissolve != null)
         {
+            if (_protoMan.TryIndex(comp.EquippedEntityOnDissolve.Value, out var proto)
+                && proto.HasComponent<SuckableFoodComponent>(_componentFactory))
+            {
+                Log.Error($"EquippedEntityOnDissolve {comp.EquippedEntityOnDissolve.Value} on entity {ToPrettyString(food)} has {nameof(SuckableFoodComponent)}!");
+                return;
+            }
+
             var ent = SpawnNextToOrDrop(comp.EquippedEntityOnDissolve.Value, ev.Sucker, overrides: comp.ComponentsOverride);
             _inventory.TryEquip(ev.Sucker, ent, ev.Container.ID, true);
         }

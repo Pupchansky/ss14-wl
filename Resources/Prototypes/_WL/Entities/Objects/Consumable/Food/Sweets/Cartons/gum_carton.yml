@@ -1,6 +1,6 @@
 - type: entity
   parent: BaseItem
-  id: GumSweetsBox
+  id: FoodSweetsGumBox
   components:
   - type: Appearance
   - type: GenericVisualizer

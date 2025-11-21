@@ -1,6 +1,6 @@
 - type: entity
   parent: BoxCardboard
-  id: GummiesSweetsBox
+  id: FoodSweetsGummiesBox
   components:
   - type: Sprite
     sprite: _WL/Entities/Objects/Consumable/Food/sweets/gummy.rsi
