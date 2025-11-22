@@ -1,8 +1,8 @@
-ent-MintStickSweetsBox = коробка мятных палочек
+ent-FoodSweetsMintStickBox = коробка мятных палочек
     .desc = Классические полосатые леденцы. Пахнет детством и новогодними праздниками.
 
-ent-GumSweetsBox = пачка жевательной резинки
+ent-FoodSweetsGumBox = пачка жевательной резинки
     .desc = НЕ ИСПОЛЬЗОВАТЬ В КАЧЕСТВЕ ГЕРМЕТИКА!
 
-ent-GummiesSweetsBox = пачка желейных конфет
+ent-FoodSweetsGummiesBox = пачка желейных конфет
     .desc = Ням-ням.
