@@ -97,7 +97,10 @@ public sealed partial class JukeboxSystem : SharedJukeboxSystem
         if (!args.IsInDetailsRange)
             return;
 
-        if (!_protoManager.TryIndex(component.SelectedSongId, out var proto))
+        if (!_protoManager.TryIndex(component.SelectedSongId, out var proto) ||
+            component.AudioStream == null ||
+            !TryComp<AudioComponent>(component.AudioStream, out var audioComp) ||
+            audioComp.State is AudioState.Paused)
         {
             args.PushMarkup(Loc.GetString("jukebox-examined-song-not-playing"), 1);
             return;
