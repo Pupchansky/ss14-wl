@@ -158,7 +158,7 @@ public sealed partial class JukeboxMenu : FancyWindow
 
     public void SetSelectedSong(/*WL-Changes-start*/string? author,/*WL-Changes-end*/ string name, float length)
     {
-        SetSelectedSongText($"{author ?? "No Author"} - {name}"); // WL-Changes
+        SetSelectedSongText(SharedJukeboxSystem.GetSongRepresentation(author, name)); // WL-Changes
 
         PlaybackSlider.MaxValue = length;
         PlaybackSlider.SetValueWithoutEvent(0);

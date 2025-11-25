@@ -2,6 +2,7 @@ using Content.Server.Power.Components;
 using Content.Server.Power.EntitySystems;
 using Content.Shared._WL.Audio.Jukebox;
 using Content.Shared.Audio.Jukebox;
+using Content.Shared.Examine;
 using Content.Shared.Power;
 using Robust.Server.GameObjects;
 using Robust.Shared.Audio;
@@ -22,7 +23,11 @@ public sealed partial class JukeboxSystem : SharedJukeboxSystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<JukeboxComponent, JukeboxVolumeChangedMessage>(OnJukeboxVolumeChanged); // WL-Changes
+        // WL-Changes-start
+        SubscribeLocalEvent<JukeboxComponent, JukeboxVolumeChangedMessage>(OnJukeboxVolumeChanged);
+        SubscribeLocalEvent<JukeboxComponent, ExaminedEvent>(OnExamined);
+        // WL-Changes-end
+
         SubscribeLocalEvent<JukeboxComponent, JukeboxSelectedMessage>(OnJukeboxSelected);
         SubscribeLocalEvent<JukeboxComponent, JukeboxPlayingMessage>(OnJukeboxPlay);
         SubscribeLocalEvent<JukeboxComponent, JukeboxPauseMessage>(OnJukeboxPause);
@@ -85,6 +90,20 @@ public sealed partial class JukeboxSystem : SharedJukeboxSystem
         Audio.SetGain(component.AudioStream, newGain);
 
         Dirty(uid, component);
+    }
+
+    private void OnExamined(EntityUid uid, JukeboxComponent component, ExaminedEvent args)
+    {
+        if (!args.IsInDetailsRange)
+            return;
+
+        if (!_protoManager.TryIndex(component.SelectedSongId, out var proto))
+        {
+            args.PushMarkup(Loc.GetString("jukebox-examined-song-not-playing"));
+            return;
+        }
+
+        args.PushMarkup(Loc.GetString("jukebox-examined-song-playing", ("song", GetSongRepresentation(proto))));
     }
     // WL-Changes-end
 
