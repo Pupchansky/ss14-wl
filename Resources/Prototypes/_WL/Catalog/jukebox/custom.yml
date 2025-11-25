@@ -1,0 +1,34 @@
+- type: jukebox
+  id: VibeAce
+  author: Kevin MacLeod
+  name: Vibe Ace
+  path:
+    path: /Audio/_WL/Jukebox/Custom/vibe_ace.ogg
+
+- type: jukebox
+  id: Marhaba
+  author: Ian Alex Mac
+  name: Marhaba
+  path:
+    path: /Audio/_WL/Jukebox/Custom/marhaba.ogg
+
+- type: jukebox
+  id: Monument
+  author: Six Umbrellas
+  name: Monument
+  path:
+    path: /Audio/_WL/Jukebox/Custom/Monument.ogg
+
+- type: jukebox
+  id: TintinOnTheMoonNoisemakerRemix
+  author: Noisemaker
+  name: Tintin on the Moon (remix)
+  path:
+    path: /Audio/_WL/Jukebox/Custom/Tintin_on_the_Moon_(Noisemakers_Remix).ogg
+
+- type: jukebox
+  id: EndlessSpaceFyreontRemix
+  author: Fyreont
+  name: Endless Space
+  path:
+    path: /Audio/_WL/Jukebox/Custom/Fyreont-Endless-Space-_SolusLunes-cover_.ogg

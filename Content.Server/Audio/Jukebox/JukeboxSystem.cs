@@ -1,5 +1,6 @@
 using Content.Server.Power.Components;
 using Content.Server.Power.EntitySystems;
+using Content.Shared._WL.Audio.Jukebox;
 using Content.Shared.Audio.Jukebox;
 using Content.Shared.Power;
 using Robust.Server.GameObjects;
@@ -12,8 +13,7 @@ using JukeboxComponent = Content.Shared.Audio.Jukebox.JukeboxComponent;
 
 namespace Content.Server.Audio.Jukebox;
 
-
-public sealed class JukeboxSystem : SharedJukeboxSystem
+public sealed partial class JukeboxSystem : SharedJukeboxSystem
 {
     [Dependency] private readonly IPrototypeManager _protoManager = default!;
     [Dependency] private readonly AppearanceSystem _appearanceSystem = default!;
@@ -21,6 +21,8 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
     public override void Initialize()
     {
         base.Initialize();
+
+        SubscribeLocalEvent<JukeboxComponent, JukeboxVolumeChangedMessage>(OnJukeboxVolumeChanged); // WL-Changes
         SubscribeLocalEvent<JukeboxComponent, JukeboxSelectedMessage>(OnJukeboxSelected);
         SubscribeLocalEvent<JukeboxComponent, JukeboxPlayingMessage>(OnJukeboxPlay);
         SubscribeLocalEvent<JukeboxComponent, JukeboxPauseMessage>(OnJukeboxPause);
@@ -40,6 +42,7 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
         }
     }
 
+    // WL-Changes-start
     private void OnJukeboxPlay(EntityUid uid, JukeboxComponent component, ref JukeboxPlayingMessage args)
     {
         if (Exists(component.AudioStream))
@@ -49,17 +52,41 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
         else
         {
             component.AudioStream = Audio.Stop(component.AudioStream);
-
-            if (string.IsNullOrEmpty(component.SelectedSongId) ||
-                !_protoManager.Resolve(component.SelectedSongId, out var jukeboxProto))
-            {
-                return;
-            }
-
-            component.AudioStream = Audio.PlayPvs(jukeboxProto.Path, uid, AudioParams.Default.WithMaxDistance(10f))?.Entity;
-            Dirty(uid, component);
+            StartPlaying(uid, component);
         }
     }
+
+    private void StartPlaying(EntityUid uid, JukeboxComponent component)
+    {
+        if (string.IsNullOrEmpty(component.SelectedSongId) ||
+            !_protoManager.Resolve(component.SelectedSongId, out var jukeboxProto))
+        {
+            return;
+        }
+
+        var @params = AudioParams.Default
+            .WithVolume(SharedAudioSystem.GainToVolume(component.Gain))
+            .WithMaxDistance(10f);
+
+        var newAudio = Audio.PlayPvs(jukeboxProto.Path, uid, @params);
+        component.AudioStream = newAudio?.Entity;
+
+        Dirty(uid, component);
+    }
+
+    private void OnJukeboxVolumeChanged(EntityUid uid, JukeboxComponent component, ref JukeboxVolumeChangedMessage args)
+    {
+        var newGain = Math.Clamp(args.Volume, 0f, 1f);
+
+        if (MathHelper.CloseTo(component.Gain, newGain))
+            return;
+
+        component.Gain = newGain;
+        Audio.SetGain(component.AudioStream, newGain);
+
+        Dirty(uid, component);
+    }
+    // WL-Changes-end
 
     private void OnJukeboxPause(Entity<JukeboxComponent> ent, ref JukeboxPauseMessage args)
     {
@@ -98,15 +125,43 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
 
     private void OnJukeboxSelected(EntityUid uid, JukeboxComponent component, JukeboxSelectedMessage args)
     {
-        if (!Audio.IsPlaying(component.AudioStream))
+        // WL-Changes-start
+        var hasStream = Exists(component.AudioStream);
+
+        if (args.SongId == component.SelectedSongId &&
+            hasStream &&
+            TryComp<AudioComponent>(component.AudioStream, out var audioComp))
         {
-            component.SelectedSongId = args.SongId;
-            DirectSetVisualState(uid, JukeboxVisualState.Select);
-            component.Selecting = true;
+            var state = audioComp.State switch
+            {
+                AudioState.Playing => AudioState.Paused,
+                AudioState.Paused => AudioState.Playing,
+                _ => AudioState.Stopped
+            };
+
+            if (state is not AudioState.Stopped)
+            {
+                Audio.SetState(component.AudioStream, state);
+                Dirty(uid, component);
+                return;
+            }
+        }
+
+        if (hasStream)
+        {
+            Audio.SetState(component.AudioStream, AudioState.Stopped);
             component.AudioStream = Audio.Stop(component.AudioStream);
         }
 
+        component.SelectedSongId = args.SongId;
+
+        DirectSetVisualState(uid, JukeboxVisualState.Select);
+        component.Selecting = true;
+
+        StartPlaying(uid, component);
+
         Dirty(uid, component);
+        // WL-Changes-end
     }
 
     public override void Update(float frameTime)
