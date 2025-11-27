@@ -1,9 +1,10 @@
-using System.Diagnostics.CodeAnalysis;
 using Content.Shared.Preferences;
 using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 using Robust.Shared.Utility;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace Content.Shared.Roles;
 
@@ -19,14 +20,15 @@ public static class JobRequirements
     public static bool TryRequirementsMet(
         JobPrototype job,
         IReadOnlyDictionary<string, TimeSpan> playTimes,
-        [NotNullWhen(false)] out FormattedMessage? reason,
+        [NotNullWhen(false)] out /*WL-Changes-start*/List<FormattedMessage>?/*WL-Changes-end*/ reason,
         IEntityManager entManager,
         IPrototypeManager protoManager,
+        /*WL-Changes-start*/IConfigurationManager cfgMan,/*WL-Changes-end*/
         HumanoidCharacterProfile? profile)
     {
         var sys = entManager.System<SharedRoleSystem>();
         var requirements = sys.GetRoleRequirements(job);
-        return TryRequirementsMet(requirements, playTimes, out reason, entManager, protoManager, profile, /*WL-Changes-start*/job/*WL-Changes-end*/);
+        return TryRequirementsMet(requirements, playTimes, out reason, entManager, protoManager, cfgMan, profile, /*WL-Changes-start*/job/*WL-Changes-end*/);
     }
 
     /// <summary>
@@ -34,29 +36,65 @@ public static class JobRequirements
     /// </summary>
     /// <param name="requirements"> The requirements to test. </param>
     /// <param name="playTimes"> The playtimes used for the check. </param>
-    /// <param name="reason"> If the requirements were not met, details are provided here. </param>
+    /// <param name="reasons"> If the requirements were not met, details are provided here. </param>
     /// <returns>Returns true if all requirements were met or there were no requirements.</returns>
     public static bool TryRequirementsMet(
         HashSet<JobRequirement>? requirements,
         IReadOnlyDictionary<string, TimeSpan> playTimes,
-        [NotNullWhen(false)] out FormattedMessage? reason,
+        [NotNullWhen(false)] out /*WL-Changes-start*/List<FormattedMessage>?/*WL-Changes-end*/ reasons,
         IEntityManager entManager,
         IPrototypeManager protoManager,
+        /*WL-Changes-start*/IConfigurationManager cfgMan,/*WL-Changes-end*/
         HumanoidCharacterProfile? profile,
         /*WL-Changes-start*/JobPrototype? job = null/*WL-Changes-end*/)
     {
-        reason = null;
+        reasons = null;
+
         if (requirements == null)
             return true;
 
+        // WL-Changes-start
+        var innerReasons = new List<FormattedMessage>();
+        var successful = true;
+
         foreach (var requirement in requirements)
         {
-            if (!requirement.Check(entManager, protoManager, profile, /*WL-Changes-start*/job/*WL-Changes-end*/, playTimes, out reason))
-                return false;
+            if (!requirement.Check(
+                    entManager,
+                    protoManager,
+                    cfgMan,
+                    profile,
+                    /*WL-Changes-start*/job/*WL-Changes-end*/,
+                    playTimes,
+                    out var reason))
+            {
+                successful = false;
+
+                if (reason != null)
+                    innerReasons.Add(reason);
+            }
         }
+
+        if (!successful)
+        {
+            reasons = innerReasons;
+            return false;
+        }
+        // WL-Changes-end
 
         return true;
     }
+
+    // WL-Changes-start
+    [return: NotNullIfNotNull(nameof(reasons))]
+    public static FormattedMessage? JoinReasons(IEnumerable<FormattedMessage>? reasons)
+    {
+        if (reasons == null)
+            return null;
+
+        return FormattedMessage.FromMarkupOrThrow(string.Join("\n", reasons.Select(f => f.ToString())));
+    }
+    // WL-Changes-end
 }
 
 /// <summary>
@@ -69,26 +107,12 @@ public abstract partial class JobRequirement
     [DataField]
     public bool Inverted;
 
-    // WL-Changes-start
-    // TODO: заменить на свойство ConfigurationManager в Check.
-    public virtual IReadOnlyList<CVarValueWrapper>? CheckingCVars => null;
-    // WL-Changes-start
-
     public abstract bool Check(
         IEntityManager entManager,
         IPrototypeManager protoManager,
+        /*WL-Changes-start*/IConfigurationManager cfgMan,/*WL-Changes-end*/
         HumanoidCharacterProfile? profile,
         /*WL-Changes-start*/JobPrototype? job,/*WL-Changes-end*/
         IReadOnlyDictionary<string, TimeSpan> playTimes,
         [NotNullWhen(false)] out FormattedMessage? reason);
-
-    //WL-Changes-start
-    public readonly record struct CVarValueWrapper(CVarDef<bool> CVar, bool Value)
-    {
-        public static implicit operator CVarValueWrapper((CVarDef<bool> CVar, bool Value) tuple)
-        {
-            return new CVarValueWrapper(tuple.CVar, tuple.Value);
-        }
-    }
-    //WL-Changes-end
 }

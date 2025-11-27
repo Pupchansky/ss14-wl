@@ -3,6 +3,7 @@ using System.Linq;
 using Content.Shared._WL.CCVars;
 using Content.Shared.Preferences;
 using JetBrains.Annotations;
+using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 using Robust.Shared.Utility;
@@ -17,11 +18,6 @@ namespace Content.Shared.Roles;
 public sealed partial class AgeRequirement : JobRequirement
 {
     //WL-Changes-start
-    public override IReadOnlyList<CVarValueWrapper>? CheckingCVars => new List<CVarValueWrapper>()
-    {
-        (WLCVars.IsAgeCheckNeeded, true)
-    };
-
     [DataField]
     public int? MinAge;
 
@@ -29,8 +25,10 @@ public sealed partial class AgeRequirement : JobRequirement
     public int? MaxAge;
     //WL-Changes-end
 
-    public override bool Check(IEntityManager entManager,
+    public override bool Check(
+        IEntityManager entManager,
         IPrototypeManager protoManager,
+        /*WL-Changes-start*/IConfigurationManager cfgMan,/*WL-Changes-end*/
         HumanoidCharacterProfile? profile,
         /*WL-Changes-start*/JobPrototype? job,/*WL-Changes-end*/
         IReadOnlyDictionary<string, TimeSpan> playTimes,
@@ -43,6 +41,9 @@ public sealed partial class AgeRequirement : JobRequirement
 
         //WL-Changes-start
         if (job is null)
+            return true;
+
+        if (cfgMan.GetCVar(WLCVars.IsAgeCheckNeeded) == false)
             return true;
 
         var isNeeded = true;
