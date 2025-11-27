@@ -45,7 +45,7 @@ public sealed class JobTest
             {Captain}: [ 1, 1 ]
 ";
 
-    private void AssertJob(TestPair pair, ProtoId<JobPrototype> job, NetUserId? user = null, bool isAntag = false)
+    private async Task AssertJob(TestPair pair, ProtoId<JobPrototype> job, NetUserId? user = null, bool isAntag = false)
     {
         var jobSys = pair.Server.System<SharedJobSystem>();
         var mindSys = pair.Server.System<MindSystem>();
@@ -65,8 +65,11 @@ public sealed class JobTest
         Assert.That(jobSys.MindTryGetJobId(mind, out var actualJob));
 
         // WL-Changes-start
-        var disallowedJobs = playTimeTrackerSys.GetDisallowedJobs(pair.Player!);
-        Assert.That(disallowedJobs, Does.Not.Contain(actualJob!.ToString()),
+        HashSet<ProtoId<JobPrototype>>? disallowedJobs = null;
+
+        await pair.Server.WaitPost(() => disallowedJobs = playTimeTrackerSys.GetDisallowedJobs(pair.Player!));
+
+        Assert.That(disallowedJobs, Does.Not.Contain(actualJob),
             $"Assigned job {actualJob} is disallowed for this player");
 
         if (disallowedJobs.Contains(job))
@@ -105,7 +108,7 @@ public sealed class JobTest
         await pair.Server.WaitPost(() => ticker.StartRound());
         await pair.RunTicksSync(10);
 
-        AssertJob(pair, Passenger);
+        await AssertJob(pair, Passenger); // WL-Changes
 
         await pair.Server.WaitPost(() => ticker.RestartRound());
         await pair.CleanReturnAsync();
@@ -134,7 +137,7 @@ public sealed class JobTest
         await pair.Server.WaitPost(() => ticker.StartRound());
         await pair.RunTicksSync(10);
 
-        AssertJob(pair, Engineer);
+        await AssertJob(pair, Engineer); // WL-Changes
 
         await pair.Server.WaitPost(() => ticker.RestartRound());
         Assert.That(ticker.RunLevel, Is.EqualTo(GameRunLevel.PreRoundLobby));
@@ -143,7 +146,7 @@ public sealed class JobTest
         await pair.Server.WaitPost(() => ticker.StartRound());
         await pair.RunTicksSync(10);
 
-        AssertJob(pair, Passenger);
+        await AssertJob(pair, Passenger); // WL-Changes
 
         await pair.Server.WaitPost(() => ticker.RestartRound());
         await pair.CleanReturnAsync();
@@ -179,7 +182,7 @@ public sealed class JobTest
         await pair.Server.WaitPost(() => ticker.StartRound());
         await pair.RunTicksSync(10);
 
-        AssertJob(pair, Captain);
+        await AssertJob(pair, Captain); // WL-Changes
 
         await pair.Server.WaitPost(() => ticker.RestartRound());
         await pair.CleanReturnAsync();
@@ -220,12 +223,12 @@ public sealed class JobTest
         await pair.Server.WaitPost(() => ticker.StartRound());
         await pair.RunTicksSync(10);
 
-        AssertJob(pair, Captain, captain);
-        Assert.Multiple(() =>
+        await AssertJob(pair, Captain, captain); // WL-Changes
+        await Assert.MultipleAsync(async () => // WL-Changes
         {
             foreach (var engi in engineers)
             {
-                AssertJob(pair, Engineer, engi);
+                await AssertJob(pair, Engineer, engi); // WL-Changes
             }
         });
 
