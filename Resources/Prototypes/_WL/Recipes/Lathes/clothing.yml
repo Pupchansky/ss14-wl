@@ -27,3 +27,39 @@
   materials:
     Cloth: 100
     Durathread: 50
+
+- type: latheRecipe
+  id: ClothingHeadHatHoodBioScientist
+  result: ClothingHeadHatHoodBioScientist
+  completetime: 2
+  materials:
+    Durathread: 50
+    Steel: 50
+    Plastic: 50
+
+- type: latheRecipe
+  id: ClothingOuterBioScientist
+  result: ClothingOuterBioScientist
+  completetime: 4
+  materials:
+    Durathread: 100
+    Steel: 75
+    Plastic: 75
+
+- type: latheRecipe
+  id: ClothingOuterHardsuitScience
+  result: ClothingOuterHardsuitScience
+  completetime: 5
+  materials:
+    Durathread: 125
+    Steel: 100
+    Plastic: 100
+
+- type: latheRecipe
+  id: ClothingUniformJumpsuitScienceDangerous
+  result: ClothingUniformJumpsuitScienceDangerous
+  completetime: 5
+  materials:
+    Durathread: 75
+    Steel: 40
+    Plastic: 40
