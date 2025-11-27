@@ -69,7 +69,10 @@ public abstract partial class JobRequirement
     [DataField]
     public bool Inverted;
 
+    // WL-Changes-start
+    // TODO: заменить на свойство ConfigurationManager в Check.
     public virtual IReadOnlyList<CVarValueWrapper>? CheckingCVars => null;
+    // WL-Changes-start
 
     public abstract bool Check(
         IEntityManager entManager,
