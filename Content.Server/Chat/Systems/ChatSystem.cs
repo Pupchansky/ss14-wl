@@ -557,7 +557,7 @@ public sealed partial class ChatSystem : SharedChatSystem
             var afterWrappedMessage = wrappedMessage;
             var afterWrappedObfuscatedMessage = wrappedobfuscatedMessage;
             var afterUnknownMessage = wrappedUnknownMessage;
-            if (!_languages.CanUnderstand(source, listener))
+            if (!_languages.CanUnderstand(source, listener, message))
             {
                 afterMessage = langObfusMessage;
                 afterObfusMessage = biobfMessage;
@@ -760,7 +760,7 @@ public sealed partial class ChatSystem : SharedChatSystem
             var afterMessage = message;
             var afterWrappedMessage = wrappedMessage;
             var afterChannel = channel;
-            if (!_languages.CanUnderstand(source, listener))
+            if (!_languages.CanUnderstand(source, listener, message))
             {
                 afterMessage = obfusMessage;
                 afterWrappedMessage = obfusWrappedMessage;

@@ -3,6 +3,7 @@ using Content.Shared._WL.Languages.Components;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Radio;
 using Content.Shared.Speech;
+using Content.Shared.Trigger.Systems;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
@@ -144,7 +145,7 @@ public sealed class LanguagesSystem : SharedLanguagesSystem
         return ObfuscateMessage(source, innerMsg, proto.ID);
     }
 
-    public bool CanUnderstand(EntityUid source, EntityUid listener)
+    public bool CanUnderstand(EntityUid source, EntityUid listener, string? message = null, ProtoId<LanguagePrototype>? overrideLang = null)
     {
         if (source == listener)
             return true;
@@ -159,8 +160,13 @@ public sealed class LanguagesSystem : SharedLanguagesSystem
             return true;
         }
 
-        var message_language = source_lang.CurrentLanguage;
-        return listen_lang.IsUnderstanding && source_lang.IsSpeaking && listen_lang.Understood.Contains(message_language);
+        var message_language = GetLanguagePrototype(source, message) ?? GetLanguagePrototype(overrideLang) ?? source_lang.CurrentLanguage;
+
+        return
+            listen_lang.IsUnderstanding &&
+            source_lang.IsSpeaking &&
+            message_language != null &&
+            listen_lang.Understood.Contains(message_language.Value);
     }
 
     public bool NeedTTS(EntityUid source)
@@ -224,7 +230,7 @@ public sealed class LanguagesSystem : SharedLanguagesSystem
         RadioChannelPrototype channel)
     {
         var isSelf = listener == source;
-        var canUnderstand = CanUnderstand(source, listener);
+        var canUnderstand = CanUnderstand(source, listener, msg);
 
         var color = GetColor(msg, source, channel.Color);
 
