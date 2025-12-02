@@ -29,7 +29,7 @@ public sealed partial class LanguagesComponent : Component
         public bool IsUnderstanding = default!;
         public bool IsSpeaking = default!;
         public string CurrentLanguage = default!;
-        public List<ProtoId<LanguagePrototype>> Speaking= default!;
+        public List<ProtoId<LanguagePrototype>> Speaking = default!;
         public List<ProtoId<LanguagePrototype>> Understood = default!;
     }
 }

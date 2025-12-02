@@ -180,7 +180,7 @@ public sealed partial class TTSSystem : EntitySystem
 
             var check = _languages.CanUnderstand(uid, listener);
 
-            if (!check &&  _languages.NeedTTS(uid)) continue;
+            if (!check && !_languages.NeedTTS(uid)) continue;
             RaiseNetworkEvent(!check ? langTtsEvent : fullTtsEvent, session);
         }
     }
@@ -220,7 +220,7 @@ public sealed partial class TTSSystem : EntitySystem
 
             var check = _languages.CanUnderstand(uid, listener);
 
-            if (!check && _languages.NeedTTS(uid)) continue;
+            if (!check && !_languages.NeedTTS(uid)) continue;
             if (check)
                 RaiseNetworkEvent(distance > ChatSystem.WhisperClearRange ? obfTtsEvent : fullTtsEvent, session);
             else

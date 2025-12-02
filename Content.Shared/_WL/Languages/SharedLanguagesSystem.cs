@@ -130,7 +130,7 @@ public abstract class SharedLanguagesSystem : EntitySystem
 
         if (TryComp<LanguagesComponent>(source, out var comp))
         {
-            if (!(message.StartsWith(LanguagePrefix)))
+            if (!message.StartsWith(LanguagePrefix))
                 return false;
 
             if (message.Length <= 2 || char.IsWhiteSpace(message[1]))
