@@ -1,20 +1,19 @@
 #nullable enable
-using System.Collections.Generic;
-using System.Linq;
-using BenchmarkDotNet.Filters;
 using Content.IntegrationTests.Pair;
 using Content.Server.GameTicking;
 using Content.Server.Mind;
 using Content.Server.Players.PlayTimeTracking;
 using Content.Server.Roles;
+using Content.Server.Roles.Jobs;
 using Content.Shared.CCVar;
 using Content.Shared.GameTicking;
 using Content.Shared.Preferences;
 using Content.Shared.Roles;
 using Content.Shared.Roles.Jobs;
-using NUnit.Framework.Interfaces;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Content.IntegrationTests.Tests.Round;
 
@@ -77,7 +76,7 @@ public sealed class JobTest
         if (disallowedJobs.Contains(job))
             TestContext.Out.WriteLine($"{nameof(JobTest)}.{nameof(AssertJob)}: Expected job {job} is disallowed for this player, actual job: {actualJob}");
         else
-            Assert.That(actualJob, Is.EqualTo(job), $"Expected job '{job}', but got '{actualJob}'. Disallowed jobs: {disallowedJobs}");
+            Assert.That(actualJob, Is.EqualTo(job), $"Expected job '{job}', but got '{actualJob}'. Disallowed jobs: [{string.Join(", ", disallowedJobs)}]");
         // WL-Changes-end
 
         Assert.That(roleSys.MindIsAntagonist(mind), Is.EqualTo(isAntag));
@@ -225,14 +224,65 @@ public sealed class JobTest
         await pair.Server.WaitPost(() => ticker.StartRound());
         await pair.RunTicksSync(10);
 
-        await AssertJob(pair, Captain, captain); // WL-Changes
-        await Assert.MultipleAsync(async () => // WL-Changes
+        // WL-Changes-start
+        var entMan = pair.Server.EntMan;
+        var playMan = pair.Server.PlayerMan;
+        var jobSys = pair.Server.System<JobSystem>();
+        var mindSys = pair.Server.System<MindSystem>();
+        var playTimeTrackerSys = pair.Server.System<PlayTimeTrackingSystem>();
+
+        var assigned = new Dictionary<NetUserId, ProtoId<JobPrototype>>();
+        var disallowed = new Dictionary<NetUserId, HashSet<ProtoId<JobPrototype>>>();
+
+        await pair.Server.WaitPost(() =>
         {
-            foreach (var engi in engineers)
+            foreach (var s in pair.Server.PlayerMan.Sessions)
             {
-                await AssertJob(pair, Engineer, engi); // WL-Changes
+                if (s.AttachedEntity == null)
+                    continue;
+
+                var user = s.UserId;
+                var ent = s.AttachedEntity.Value;
+
+                var mind = mindSys.GetMind(ent);
+                if (!entMan.EntityExists(mind))
+                    continue;
+
+                if (jobSys.MindTryGetJobId(mind, out var j) && j != null)
+                    assigned[user] = j.Value;
+
+                disallowed[user] = playTimeTrackerSys.GetDisallowedJobs(user);
             }
         });
+
+        await Assert.MultipleAsync(async () =>
+        {
+            var captainCount = assigned.Values.Count(v => v == Captain);
+            Assert.That(captainCount, Is.EqualTo(1), $"Expected exactly one {Captain} assigned, got {captainCount}.");
+
+            if (disallowed.TryGetValue(captain, out var capDisallowed) && capDisallowed.Contains(Captain))
+            {
+                TestContext.Out.WriteLine($"{nameof(JobTest)}.{nameof(JobPriorityTest)}: Target captain {captain} has {Captain} disallowed. Skipping check.");
+            }
+            else
+            {
+                Assert.That(assigned.ContainsKey(captain) && assigned[captain] == Captain,
+                    $"Expected captain {captain} to receive {Captain}, got {assigned.GetValueOrDefault(captain)}. Disallowed: [{string.Join(",", disallowed.GetValueOrDefault(captain) ?? [])}]");
+            }
+
+            foreach (var engi in engineers)
+            {
+                if (disallowed.TryGetValue(engi, out var dis) && dis.Contains(Engineer))
+                {
+                    TestContext.Out.WriteLine($"{nameof(JobTest)}.{nameof(JobPriorityTest)}: Player {engi} has {Engineer} disallowed. Skipping check.");
+                    continue;
+                }
+
+                Assert.That(assigned.ContainsKey(engi) && assigned[engi] == Engineer,
+                    $"Expected {Engineer} for {engi}, got {assigned.GetValueOrDefault(engi)}. Disallowed: [{string.Join(",", disallowed.GetValueOrDefault(engi) ?? [])}]");
+            }
+        });
+        // WL-Changes-end
 
         await pair.Server.WaitPost(() => ticker.RestartRound());
         await pair.CleanReturnAsync();
