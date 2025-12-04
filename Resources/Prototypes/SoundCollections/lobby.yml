@@ -17,12 +17,15 @@
     - /Audio/Lobby/every_light_is_blinking_at_once.ogg
     - /Audio/Corvax/Lobby/title2.ogg # Corvax-LobbyMusic
     - /Audio/_WL/Lobby/atomicamnesiammx.ogg # WL-Changes
-    - /Audio/_WL/Lobby/the_station.ogg # WL-Changes
-    - /Audio/_WL/Lobby/spacebard.ogg # WL-Changes
-    - /Audio/_WL/Lobby/quirky_goblins.ogg # WL-Changes
     - /Audio/Corvax/Lobby/service.ogg # Corvax-LobbyMusic
     - /Audio/Corvax/Lobby/nodecision.ogg # Corvax-LobbyMusic
-    - /Audio/_WL/Jukebox/Custom/Tintin_on_the_Moon_(Noisemakers_Remix).ogg # WL-Changes
-    - /Audio/_WL/Jukebox/Custom/vibe_ace.ogg # WL-Changes
-    - /Audio/_WL/Jukebox/Custom/marhaba.ogg # WL-Changes
-    - /Audio/_WL/Jukebox/Custom/Monument.ogg # WL-Changes
+    # WL-Changes-start
+    - /Audio/_WL/Lobby/the_station.ogg
+    - /Audio/_WL/Lobby/spacebard.ogg
+    - /Audio/_WL/Lobby/quirky_goblins.ogg
+    - /Audio/_WL/Jukebox/Custom/Tintin_on_the_Moon_(Noisemakers_Remix).ogg
+    - /Audio/_WL/Jukebox/Custom/vibe_ace.ogg
+    - /Audio/_WL/Jukebox/Custom/marhaba.ogg
+    - /Audio/_WL/Jukebox/Custom/Monument.ogg
+    - /Audio/_WL/Jukebox/Custom/Fyreont-Endless-Space-_SolusLunes-cover_.ogg
+    # WL-Changes-end
