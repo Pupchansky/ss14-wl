@@ -16,3 +16,8 @@
       state: cpu_service
     - type: ComputerBoard
       prototype: StationaryComputer
+    - type: PhysicalComposition
+      materialComposition:
+        Steel: 50
+        Glass: 40
+        Plastic: 70
